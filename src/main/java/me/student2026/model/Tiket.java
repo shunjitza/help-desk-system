@@ -1,9 +1,10 @@
 package me.student2026.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "tiket")
+@Table(name = "tiketi")
 public class Tiket {
 
     @Id
@@ -11,11 +12,11 @@ public class Tiket {
     private Long id;
 
     private String naslov;
+
     private String opis;
 
-    @ManyToOne
-    @JoinColumn(name = "korisnik_id")
-    private Korisnik korisnik;
+    @Transient
+    private List<Prilog> prilozi;
 
     public Tiket() {
     }
@@ -40,11 +41,11 @@ public class Tiket {
         this.opis = opis;
     }
 
-    public Korisnik getKorisnik() {
-        return korisnik;
+    public List<Prilog> getPrilozi() {
+        return prilozi;
     }
 
-    public void setKorisnik(Korisnik korisnik) {
-        this.korisnik = korisnik;
+    public void setPrilozi(List<Prilog> prilozi) {
+        this.prilozi = prilozi;
     }
 }
