@@ -1,6 +1,11 @@
 package me.student2026.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "tipovi_tiketa")
@@ -34,5 +39,21 @@ public class TipTiketa {
 
     public void setOpis(String opis) {
         this.opis = opis;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof TipTiketa tipTiketa)) return false;
+        return Objects.equals(id, tipTiketa.id) && Objects.equals(naziv, tipTiketa.naziv) && Objects.equals(opis, tipTiketa.opis);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, naziv, opis);
+    }
+
+    @Override
+    public String toString() {
+        return "TipTiketa{id=" + id + ", naziv='" + naziv + "', opis='" + opis + "'}";
     }
 }
