@@ -5,7 +5,12 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import me.student2026.exception.ResourceNotFoundException;
+import me.student2026.model.IpResponse;
 import me.student2026.model.Korisnik;
+import me.student2026.model.TimezoneResponse;
+import me.student2026.rest.client.IpClient;
+import me.student2026.rest.client.TimezoneClient;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.List;
 
@@ -14,6 +19,15 @@ public class KorisnikService {
 
     @Inject
     private EntityManager em;
+
+    @Inject
+    @RestClient
+    IpClient ipClient;
+
+    @Inject
+    @RestClient
+    TimezoneClient timezoneClient;
+
 
     @Transactional
     public Korisnik createKorisnik(Korisnik korisnik) throws ResourceNotFoundException {
@@ -56,5 +70,23 @@ public class KorisnikService {
             throw new ResourceNotFoundException("Korisnik sa id=" + id + " nije pronađen.");
         }
         return korisnik;
+    }
+
+    @Transactional
+    public Korisnik assignTimezoneByIP(Long userId) throws ResourceNotFoundException {
+        Korisnik korisnik = getById(userId);
+
+        IpResponse ipResponse = ipClient.getIp("json");
+        if (ipResponse == null || ipResponse.getIp() == null || ipResponse.getIp().isEmpty()) {
+            throw new ResourceNotFoundException("Nije moguće dobiti IP adresu.");
+        }
+
+        TimezoneResponse timezone = timezoneClient.getTimezoneByIp(ipResponse.getIp());
+        if (timezone == null) {
+            throw new ResourceNotFoundException("Nije moguće dobiti timezone za IP " + ipResponse.getIp());
+        }
+
+        korisnik.getTimezoneResponses().add(timezone);
+        return em.merge(korisnik);
     }
 }

@@ -56,4 +56,16 @@ public class KorisnikResource {
         Korisnik korisnik = korisnikService.getById(id);
         return Response.ok().entity(korisnik).build();
     }
+
+    @GET
+    @Path("/getTimezoneByIP")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTimezoneByIP(@QueryParam("userId") Long userId) {
+        try {
+            Korisnik korisnik = korisnikService.assignTimezoneByIP(userId);
+            return Response.ok(korisnik).build();
+        } catch (ResourceNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
 }

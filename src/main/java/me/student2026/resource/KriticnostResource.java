@@ -1,5 +1,6 @@
 package me.student2026.resource;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -16,9 +17,10 @@ public class KriticnostResource {
     @Inject
     KriticnostService kriticnostService;
 
+    @RolesAllowed("admin")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/addKriticnost")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response addKriticnost(Kriticnost kriticnost) {
         try {
             kriticnostService.createKriticnost(kriticnost);

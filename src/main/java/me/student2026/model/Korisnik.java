@@ -1,6 +1,9 @@
 package me.student2026.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -20,6 +23,10 @@ public class Korisnik {
 
     @OneToOne(mappedBy = "korisnik", cascade = CascadeType.ALL, orphanRemoval = true)
     private KorisnikProfil profil;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "korisnik_id")
+    private List<TimezoneResponse> timezoneResponses = new ArrayList<>();
 
     public Korisnik() {
     }
@@ -61,6 +68,14 @@ public class Korisnik {
         if (postavke != null) {
             postavke.setKorisnik(this);
         }
+    }
+
+    public List<TimezoneResponse> getTimezoneResponses() {
+        return timezoneResponses;
+    }
+
+    public void setTimezoneResponses(List<TimezoneResponse> timezoneResponses) {
+        this.timezoneResponses = timezoneResponses;
     }
 
     public KorisnikProfil getProfil() {
