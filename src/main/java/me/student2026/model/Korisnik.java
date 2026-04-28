@@ -24,7 +24,7 @@ public class Korisnik {
     @OneToOne(mappedBy = "korisnik", cascade = CascadeType.ALL, orphanRemoval = true)
     private KorisnikProfil profil;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "korisnik_id")
     private List<TimezoneResponse> timezoneResponses = new ArrayList<>();
 

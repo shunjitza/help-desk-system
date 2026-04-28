@@ -11,5 +11,5 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 public interface IpClient {
 
     @GET
-    IpResponse getIp(@QueryParam("format") String format);
+    String getIp();
 }

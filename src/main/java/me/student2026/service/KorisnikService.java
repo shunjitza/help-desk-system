@@ -76,14 +76,14 @@ public class KorisnikService {
     public Korisnik assignTimezoneByIP(Long userId) throws ResourceNotFoundException {
         Korisnik korisnik = getById(userId);
 
-        IpResponse ipResponse = ipClient.getIp("json");
-        if (ipResponse == null || ipResponse.getIp() == null || ipResponse.getIp().isEmpty()) {
+        String ipResponse = ipClient.getIp();
+        if (ipResponse == null) {
             throw new ResourceNotFoundException("Nije moguće dobiti IP adresu.");
         }
 
-        TimezoneResponse timezone = timezoneClient.getTimezoneByIp(ipResponse.getIp());
+        TimezoneResponse timezone = timezoneClient.getTimezoneByIp(ipResponse);
         if (timezone == null) {
-            throw new ResourceNotFoundException("Nije moguće dobiti timezone za IP " + ipResponse.getIp());
+            throw new ResourceNotFoundException("Nije moguće dobiti timezone za IP " + ipResponse);
         }
 
         korisnik.getTimezoneResponses().add(timezone);
