@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import me.student2026.exception.ResourceNotFoundException;
-import me.student2026.model.IpResponse;
 import me.student2026.model.Korisnik;
 import me.student2026.model.TimezoneResponse;
 import me.student2026.rest.client.IpClient;
