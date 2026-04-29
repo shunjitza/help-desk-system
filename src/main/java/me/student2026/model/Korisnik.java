@@ -28,6 +28,10 @@ public class Korisnik {
     @JoinColumn(name = "korisnik_id")
     private List<TimezoneResponse> timezoneResponses = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "korisnik_id")
+    private List<CurrencyResponse> currencyResponses = new ArrayList<>();
+
     public Korisnik() {
     }
 
@@ -89,8 +93,16 @@ public class Korisnik {
         }
     }
 
-@Override
-public boolean equals(Object o) {
+    public List<CurrencyResponse> getCurrencyResponses() {
+        return currencyResponses;
+    }
+
+    public void setCurrencyResponses(List<CurrencyResponse> currencyResponses) {
+        this.currencyResponses = currencyResponses;
+    }
+
+    @Override
+    public boolean equals(Object o) {
     if (!(o instanceof Korisnik korisnik)) return false;
     return Objects.equals(id, korisnik.id) && Objects.equals(ime, korisnik.ime) && Objects.equals(email, korisnik.email) && Objects.equals(lozinka, korisnik.lozinka) && Objects.equals(postavke, korisnik.postavke) && Objects.equals(profil, korisnik.profil);
 }

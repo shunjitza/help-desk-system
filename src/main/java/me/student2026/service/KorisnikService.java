@@ -5,8 +5,10 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import me.student2026.exception.ResourceNotFoundException;
+import me.student2026.model.CurrencyResponse;
 import me.student2026.model.Korisnik;
 import me.student2026.model.TimezoneResponse;
+import me.student2026.rest.client.CurrencyClient;
 import me.student2026.rest.client.IpClient;
 import me.student2026.rest.client.TimezoneClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -22,6 +24,11 @@ public class KorisnikService {
     @Inject
     @RestClient
     IpClient ipClient;
+
+    @Inject
+    @RestClient
+    CurrencyClient currencyClient;
+
 
     @Inject
     @RestClient
@@ -88,4 +95,22 @@ public class KorisnikService {
         korisnik.getTimezoneResponses().add(timezone);
         return em.merge(korisnik);
     }
+
+    @Transactional
+    public Korisnik getCurrency(String from, String to, double value, Long userId) throws ResourceNotFoundException {
+        Korisnik korisnik = getById(userId);
+
+        CurrencyResponse currencyResponse = currencyClient.getCurrency(from, to);
+        if (currencyResponse == null) {
+            throw new ResourceNotFoundException("Nije moguće dobiti kurs valute.");
+        }
+
+        double convertedValue = value * currencyResponse.getRate();
+        currencyResponse.setValue(value);
+        currencyResponse.setConvertedValue(convertedValue);
+
+        korisnik.getCurrencyResponses().add(currencyResponse);
+        return em.merge(korisnik);
+    }
+
 }

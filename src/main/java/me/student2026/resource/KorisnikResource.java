@@ -1,5 +1,6 @@
 package me.student2026.resource;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -63,6 +64,19 @@ public class KorisnikResource {
     public Response getTimezoneByIP(@QueryParam("userId") Long userId) {
         try {
             Korisnik korisnik = korisnikService.assignTimezoneByIP(userId);
+            return Response.ok(korisnik).build();
+        } catch (ResourceNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
+
+    @RolesAllowed("admin")
+    @GET
+    @Path("/currencyConversion")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrencyConversion(@QueryParam("from") String from, @QueryParam("to") String to, @QueryParam("value") double value, @QueryParam("userId") Long userId) {
+        try {
+            Korisnik korisnik = korisnikService.getCurrency(from, to, value, userId);
             return Response.ok(korisnik).build();
         } catch (ResourceNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
