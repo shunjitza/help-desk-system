@@ -3,6 +3,7 @@ package me.student2026.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,8 +21,13 @@ public class Tiket {
 
     private LocalDateTime rok;
 
-    @OneToMany(mappedBy = "tiket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Prilog> prilozi;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "tiket_uploaded_files",
+        joinColumns = @JoinColumn(name = "tiket_id"),
+        inverseJoinColumns = @JoinColumn(name = "uploaded_file_id")
+    )
+    private List<UploadedFile> uploadedFiles = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "stadijum_id")
@@ -66,12 +72,12 @@ public class Tiket {
         this.rok = rok;
     }
 
-    public List<Prilog> getPrilozi() {
-        return prilozi;
+    public List<UploadedFile> getUploadedFiles() {
+        return uploadedFiles;
     }
 
-    public void setPrilozi(List<Prilog> prilozi) {
-        this.prilozi = prilozi;
+    public void setUploadedFiles(List<UploadedFile> uploadedFiles) {
+        this.uploadedFiles = uploadedFiles;
     }
 
     public Stadijum getStadijum() {

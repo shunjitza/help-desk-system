@@ -4,10 +4,18 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import me.student2026.exception.FileAlreadyExistsException;
 import me.student2026.exception.ResourceNotFoundException;
-import me.student2026.model.Prilog;
+import me.student2026.model.FileUploadForm;
 import me.student2026.model.Tiket;
+import me.student2026.model.UploadedFile;
+import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Dependent
@@ -56,11 +64,39 @@ public class TiketService {
         return tiket;
     }
 
-    public List<Prilog> getPrilozi(Long id) {
-        Tiket tiket = em.find(Tiket.class, id);
-        if (tiket == null) {
-            throw new ResourceNotFoundException("Tiket sa id=" + id + " nije pronađen.");
+    @Transactional
+    public Tiket uploadFileToTiket(Long tiketId, FileUploadForm form) {
+        Tiket tiket = getById(tiketId);
+
+        String uploadDir = System.getProperty("user.home") + "/uploads/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        return tiket.getPrilozi();
+
+        File destFile = new File(uploadDir + form.filename);
+        if (destFile.exists()) {
+            throw new FileAlreadyExistsException("Fajl '" + form.filename + "' vec postoji na putanji: " + destFile.getAbsolutePath());
+        }
+
+        try {
+            Files.copy(form.file.uploadedFile(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Greška pri čuvanju fajla: " + e.getMessage());
+        }
+
+        UploadedFile uploadedFile = new UploadedFile();
+        uploadedFile.setFilename(destFile.getAbsolutePath());
+
+        tiket.getUploadedFiles().add(uploadedFile);
+        return em.merge(tiket);
+    }
+
+    public Tiket getTiketWithFiles(Long id) {
+        Tiket tiket = getById(id);
+        for (UploadedFile uf : tiket.getUploadedFiles()) {
+            uf.setFile(new File(uf.getFilename()));
+        }
+        return tiket;
     }
 }

@@ -4,8 +4,9 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import me.student2026.exception.FileAlreadyExistsException;
 import me.student2026.exception.ResourceNotFoundException;
-import me.student2026.model.Prilog;
+import me.student2026.model.FileUploadForm;
 import me.student2026.model.Tiket;
 import me.student2026.service.TiketService;
 
@@ -58,11 +59,30 @@ public class TiketResource {
         return Response.ok().entity(tiket).build();
     }
 
-    @GET
-    @Path("/getPriloziByTiketId")
+    @POST
+    @Path("/uploadFile")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPriloziByTiketId(@QueryParam("id") Long id) {
-        List<Prilog> prilozi = tiketService.getPrilozi(id);
-        return Response.ok().entity(prilozi).build();
+    public Response uploadFile(@QueryParam("tiketId") Long tiketId, FileUploadForm form) {
+        try {
+            Tiket tiket = tiketService.uploadFileToTiket(tiketId, form);
+            return Response.ok(tiket).build();
+        } catch (FileAlreadyExistsException e) {
+            return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+        } catch (ResourceNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/getTiketWithFiles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTiketWithFiles(@QueryParam("id") Long id) {
+        try {
+            Tiket tiket = tiketService.getTiketWithFiles(id);
+            return Response.ok(tiket).build();
+        } catch (ResourceNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 }
